@@ -27,8 +27,10 @@ import androidx.core.widget.TextViewCompat
 import com.tapadoo.alerter.utils.getDimenPixelSize
 import com.tapadoo.alerter.utils.getRippleDrawable
 import com.tapadoo.alerter.utils.notchHeight
+import com.tapadoo.alerter.utils.statusBarHeight
 import kotlinx.android.synthetic.main.alerter_alert_default_layout.view.*
 import kotlinx.android.synthetic.main.alerter_alert_view.view.*
+import kotlin.math.max
 
 /**
  * Custom Alert View
@@ -119,8 +121,17 @@ class Alert @JvmOverloads constructor(context: Context,
     val layoutContainer: View? by lazy { findViewById<View>(R.id.vAlertContentContainer) }
 
     private val navigationBarHeight by lazy {
-        val dimenId = resources.getIdentifier("navigation_bar_height", "dimen", "android")
-        resources.getDimensionPixelSize(dimenId)
+        val winManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        var realSize = Point()
+        var screenSize = Point()
+        val rect = Rect()
+        winManager.defaultDisplay.getSize(screenSize)
+        winManager.defaultDisplay.getRealSize(realSize)
+        winManager.defaultDisplay.getRectSize(rect)
+        if (realSize.x < screenSize.x)
+            realSize.x - screenSize.x
+        else
+            (realSize.y - screenSize.y) - notchHeight()
     }
 
     init {
@@ -149,13 +160,6 @@ class Alert @JvmOverloads constructor(context: Context,
             }
 
             (layoutParams as LayoutParams).gravity = layoutGravity
-
-            if (layoutGravity != Gravity.TOP) {
-                setPadding(
-                        paddingLeft, getDimenPixelSize(R.dimen.alerter_padding_default),
-                        paddingRight, getDimenPixelSize(R.dimen.alerter_alert_padding)
-                )
-            }
         }
 
         (layoutParams as MarginLayoutParams).apply {
@@ -181,13 +185,8 @@ class Alert @JvmOverloads constructor(context: Context,
             marginSet = true
 
             // Add a negative top margin to compensate for overshoot enter animation
-            (layoutParams as MarginLayoutParams).topMargin = getDimenPixelSize(R.dimen.alerter_alert_negative_margin_top)
-
-            // Check for Cutout
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                llAlertBackground.apply {
-                    setPadding(paddingLeft, paddingTop + (notchHeight() / 2), paddingRight, paddingBottom)
-                }
+            if (layoutGravity == Gravity.TOP) {
+                (layoutParams as MarginLayoutParams).topMargin = max(notchHeight(), statusBarHeight())
             }
         }
 

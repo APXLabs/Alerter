@@ -13,9 +13,17 @@ import com.tapadoo.alerter.R
 
 fun Alert.getDimenPixelSize(@DimenRes id: Int) = resources.getDimensionPixelSize(id)
 
-@RequiresApi(Build.VERSION_CODES.P)
-fun Alert.notchHeight() = (context as? Activity)?.window?.decorView?.rootWindowInsets?.displayCutout?.safeInsetTop
-        ?: 0
+fun Alert.notchHeight(): Int {
+	return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+		display.cutout?.safeInsetTop ?: 0
+	else 0
+
+}
+
+fun Alert.statusBarHeight(): Int {
+	val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
+	return if (resourceId > 0) resources.getDimensionPixelSize(resourceId) else 0
+}
 
 fun Context.getRippleDrawable(): Drawable? {
 	val typedValue = TypedValue()
