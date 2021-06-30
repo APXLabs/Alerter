@@ -556,6 +556,12 @@ class Alerter private constructor() {
         return this
     }
 
+    fun setOnTapListener(listener: OnTapListener): Alerter {
+        alert?.setOnTapListener(listener)
+
+        return this
+    }
+
     /**
      * Enables swipe to dismiss
      *

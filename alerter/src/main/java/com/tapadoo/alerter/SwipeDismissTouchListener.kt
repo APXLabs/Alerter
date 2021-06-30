@@ -119,6 +119,16 @@ internal class SwipeDismissTouchListener(
                                 .setDuration(mAnimationTime)
                                 .setListener(null)
                         mCallbacks.onTouch(view, false)
+                    } else {
+                        mView.animate()
+                                .translationX(mViewWidth.toFloat())
+                                .alpha(0f)
+                                .setDuration(mAnimationTime)
+                                .setListener(object : AnimatorListenerAdapter() {
+                                    override fun onAnimationEnd(animation: Animator) {
+                                        mCallbacks.onTap(view)
+                                    }
+                                })
                     }
                     this.recycle()
                     mVelocityTracker = null
@@ -234,5 +244,12 @@ internal class SwipeDismissTouchListener(
          * @param touch The view is being touched.
          */
         fun onTouch(view: View, touch: Boolean)
+
+        /**
+         * called on the user tapped on the view
+         *
+         * @param view The originating [View]
+         */
+        fun onTap(view: View)
     }
 }

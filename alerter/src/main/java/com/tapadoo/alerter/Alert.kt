@@ -45,6 +45,7 @@ class Alert @JvmOverloads constructor(context: Context,
 
     private var onShowListener: OnShowAlertListener? = null
     internal var onHideListener: OnHideAlertListener? = null
+    private var onTapListener: OnTapListener? = null
 
     internal var enterAnimation: Animation = AnimationUtils.loadAnimation(context, R.anim.alerter_slide_in_from_top)
     internal var exitAnimation: Animation = AnimationUtils.loadAnimation(context, R.anim.alerter_slide_out_to_top)
@@ -181,7 +182,7 @@ class Alert @JvmOverloads constructor(context: Context,
             marginSet = true
 
             // Add a negative top margin to compensate for overshoot enter animation
-            (layoutParams as MarginLayoutParams).topMargin = getDimenPixelSize(R.dimen.alerter_alert_negative_margin_top)
+          //  (layoutParams as MarginLayoutParams).topMargin = getDimenPixelSize(R.dimen.alerter_alert_negative_margin_top)
 
             // Check for Cutout
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -699,6 +700,10 @@ class Alert @JvmOverloads constructor(context: Context,
                 override fun onTouch(view: View, touch: Boolean) {
                     // Ignore
                 }
+
+                override fun onTap(view: View) {
+
+                }
             }))
         }
     }
@@ -764,6 +769,10 @@ class Alert @JvmOverloads constructor(context: Context,
      */
     fun setOnShowListener(listener: OnShowAlertListener) {
         this.onShowListener = listener
+    }
+
+    fun setOnTapListener(listener: OnTapListener) {
+        this.onTapListener = listener
     }
 
     /**
@@ -832,6 +841,10 @@ class Alert @JvmOverloads constructor(context: Context,
         } else {
             startHideAnimation()
         }
+    }
+
+    override fun onTap(view: View) {
+
     }
 
     companion object {

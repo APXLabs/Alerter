@@ -37,6 +37,7 @@ class KotlinDemoActivity : AppCompatActivity() {
         Alerter.create(this@KotlinDemoActivity)
                 .setTitle(R.string.title_activity_example)
                 .setText("Alert text...")
+                .enableInfiniteDuration(true)
                 .show()
     }
 
