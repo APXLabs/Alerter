@@ -701,7 +701,7 @@ class Alert @JvmOverloads constructor(context: Context,
                 }
 
                 override fun onTap(view: View) {
-                    onTapListener.onTap()
+                    onTapListener?.onTap()
                 }
             }))
         }
