@@ -121,7 +121,7 @@ internal class SwipeDismissTouchListener(
                         mCallbacks.onTouch(view, false)
                     } else {
                         mView.animate()
-                                .translationX(mViewWidth.toFloat())
+                                .translationX(0f)
                                 .alpha(0f)
                                 .setDuration(mAnimationTime)
                                 .setListener(object : AnimatorListenerAdapter() {
