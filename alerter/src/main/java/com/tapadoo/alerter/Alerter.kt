@@ -32,7 +32,8 @@ class Alerter private constructor() {
      *
      * @param alert The Alert to be references and maintained
      */
-    private var alert: Alert? = null
+    var alert: Alert? = null
+        private set
 
     /**
      * Shows the Alert, after it's built
@@ -42,7 +43,7 @@ class Alerter private constructor() {
     fun show(): Alert? {
         //This will get the Activity Window's DecorView
         decorView?.get()?.let {
-            android.os.Handler(Looper.getMainLooper()).post {
+            it.post {
                 it.addView(alert)
             }
         }
@@ -715,7 +716,7 @@ class Alerter private constructor() {
 
     companion object {
 
-        private var decorView: WeakReference<ViewGroup>? = null
+        var decorView: WeakReference<ViewGroup>? = null
 
         /**
          * Creates the Alert
@@ -819,8 +820,10 @@ class Alerter private constructor() {
                 if (childView != null) {
                     if (childView.windowToken != null)
                         ViewCompat.animate(childView).alpha(0f).withEndAction(getRemoveViewRunnable(childView, listener))
-                    else
+                    else {
                         (childView.parent as? ViewGroup)?.removeView(childView)
+                        listener?.onHide()
+                    }
                 }
             }
         }
