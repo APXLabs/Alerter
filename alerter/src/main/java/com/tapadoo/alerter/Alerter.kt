@@ -32,7 +32,8 @@ class Alerter private constructor() {
      *
      * @param alert The Alert to be references and maintained
      */
-    private var alert: Alert? = null
+    var alert: Alert? = null
+        private set
 
     /**
      * Shows the Alert, after it's built
@@ -42,7 +43,7 @@ class Alerter private constructor() {
     fun show(): Alert? {
         //This will get the Activity Window's DecorView
         decorView?.get()?.let {
-            android.os.Handler(Looper.getMainLooper()).post {
+            it.post {
                 it.addView(alert)
             }
         }
@@ -715,7 +716,7 @@ class Alerter private constructor() {
 
     companion object {
 
-        private var decorView: WeakReference<ViewGroup>? = null
+        var decorView: WeakReference<ViewGroup>? = null
 
         /**
          * Creates the Alert
@@ -781,13 +782,11 @@ class Alerter private constructor() {
         @JvmStatic
         @JvmOverloads
         fun clearCurrent(activity: Activity?, dialog: Dialog?, listener: OnHideAlertListener? = null) {
-            dialog?.let {
-                it.window?.decorView as? ViewGroup
-            } ?: kotlin.run {
-                activity?.window?.decorView as? ViewGroup
-            }?.also {
-                removeAlertFromParent(it, listener)
-            } ?: listener?.onHide()
+            // We don't pass the listener into the removals, and instead, call it at the end
+            (dialog?.window?.decorView as? ViewGroup)?.let { removeAlertFromParent(it, null) }
+            (activity?.window?.decorView as? ViewGroup)?.let { removeAlertFromParent(it, null) }
+            decorView?.get()?.let { removeAlertFromParent(it, null) }
+            listener?.onHide()
         }
 
         /**
@@ -819,8 +818,13 @@ class Alerter private constructor() {
             //Find all Alert Views in Parent layout
             for (i in 0..decorView.childCount) {
                 val childView = if (decorView.getChildAt(i) is Alert) decorView.getChildAt(i) as Alert else null
-                if (childView != null && childView.windowToken != null) {
-                    ViewCompat.animate(childView).alpha(0f).withEndAction(getRemoveViewRunnable(childView, listener))
+                if (childView != null) {
+                    if (childView.windowToken != null)
+                        ViewCompat.animate(childView).alpha(0f).withEndAction(getRemoveViewRunnable(childView, listener))
+                    else {
+                        (childView.parent as? ViewGroup)?.removeView(childView)
+                        listener?.onHide()
+                    }
                 }
             }
         }
@@ -834,11 +838,9 @@ class Alerter private constructor() {
         val isShowing: Boolean
             get() {
                 var isShowing = false
-
                 decorView?.get()?.let {
                     isShowing = it.findViewById<View>(R.id.llAlertBackground) != null
                 }
-
                 return isShowing
             }
 
