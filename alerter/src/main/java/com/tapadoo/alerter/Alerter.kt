@@ -781,13 +781,10 @@ class Alerter private constructor() {
         @JvmStatic
         @JvmOverloads
         fun clearCurrent(activity: Activity?, dialog: Dialog?, listener: OnHideAlertListener? = null) {
-            dialog?.let {
-                it.window?.decorView as? ViewGroup
-            } ?: kotlin.run {
-                activity?.window?.decorView as? ViewGroup
-            }?.also {
-                removeAlertFromParent(it, listener)
-            } ?: listener?.onHide()
+            (dialog?.window?.decorView as? ViewGroup)?.let { removeAlertFromParent(it, listener) }
+            (activity?.window?.decorView as? ViewGroup)?.let { removeAlertFromParent(it, listener) }
+            decorView?.get()?.let { removeAlertFromParent(it, listener) }
+            listener?.onHide()
         }
 
         /**
@@ -819,8 +816,11 @@ class Alerter private constructor() {
             //Find all Alert Views in Parent layout
             for (i in 0..decorView.childCount) {
                 val childView = if (decorView.getChildAt(i) is Alert) decorView.getChildAt(i) as Alert else null
-                if (childView != null && childView.windowToken != null) {
-                    ViewCompat.animate(childView).alpha(0f).withEndAction(getRemoveViewRunnable(childView, listener))
+                if (childView != null) {
+                    if (childView.windowToken != null)
+                        ViewCompat.animate(childView).alpha(0f).withEndAction(getRemoveViewRunnable(childView, listener))
+                    else
+                        (childView.parent as? ViewGroup)?.removeView(childView)
                 }
             }
         }
