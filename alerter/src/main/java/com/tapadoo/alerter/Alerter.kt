@@ -782,9 +782,10 @@ class Alerter private constructor() {
         @JvmStatic
         @JvmOverloads
         fun clearCurrent(activity: Activity?, dialog: Dialog?, listener: OnHideAlertListener? = null) {
-            (dialog?.window?.decorView as? ViewGroup)?.let { removeAlertFromParent(it, listener) }
-            (activity?.window?.decorView as? ViewGroup)?.let { removeAlertFromParent(it, listener) }
-            decorView?.get()?.let { removeAlertFromParent(it, listener) }
+            // We don't pass the listener into the removals, and instead, call it at the end
+            (dialog?.window?.decorView as? ViewGroup)?.let { removeAlertFromParent(it, null) }
+            (activity?.window?.decorView as? ViewGroup)?.let { removeAlertFromParent(it, null) }
+            decorView?.get()?.let { removeAlertFromParent(it, null) }
             listener?.onHide()
         }
 
@@ -837,11 +838,9 @@ class Alerter private constructor() {
         val isShowing: Boolean
             get() {
                 var isShowing = false
-
                 decorView?.get()?.let {
                     isShowing = it.findViewById<View>(R.id.llAlertBackground) != null
                 }
-
                 return isShowing
             }
 
