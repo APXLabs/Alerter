@@ -16,6 +16,8 @@ import android.view.animation.AnimationUtils
 import androidx.annotation.*
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
+import java.lang.Error
+import java.lang.Exception
 import java.lang.ref.WeakReference
 
 /**
@@ -838,8 +840,12 @@ class Alerter private constructor() {
         val isShowing: Boolean
             get() {
                 var isShowing = false
-                decorView?.get()?.let {
-                    isShowing = it.findViewById<View>(R.id.llAlertBackground) != null
+                try {
+                    decorView?.get()?.let {
+                        isShowing = it.findViewById<View>(R.id.llAlertBackground) != null
+                    }
+                } catch (error : Exception) {
+                    return false
                 }
                 return isShowing
             }
